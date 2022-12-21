@@ -26,6 +26,7 @@ module.exports = class extends Frame {
 	    /* init config */
             this.confmng().add('hoverEvent', { type:'event', list:true });
             this.confmng().add('selectEvent', { type:'event', list:true });
+            this.confmng().add('href', { type: 'string' });
             
 	    if (0 < arguments.length) {
                 this.config(p1);
@@ -54,6 +55,10 @@ module.exports = class extends Frame {
             };
             let sel_evt = (s1,s2,s3) => {
                 try {
+                    if (null !== s1.href()) {
+                        window.location.href = s1.href();
+                        return;
+                    }
                     let evt_lst = s1.selectEvent();
                     for (let eidx in evt_lst) {
                         evt_lst[eidx][0](s1,s2,evt_lst[eidx][1]);
@@ -64,8 +69,8 @@ module.exports = class extends Frame {
                 }
             };
             this.event([
-                new Hover(this.hov_evt),
-                new Click(this.sel_evt)
+                new Hover(hov_evt),
+                new Click(sel_evt)
             ]);
         } catch (e) {
             console.error(e.stack);
@@ -92,6 +97,15 @@ module.exports = class extends Frame {
                        (undefined === fnc) ? fnc : [fnc,prm]
                    );
         } catch (e) {
+            console.error(e.stack);
+            throw e;
+        }
+    }
+    
+    href (prm) {
+        try {
+            return this.confmng('href', prm);
+	} catch (e) {
             console.error(e.stack);
             throw e;
         }
